@@ -7,43 +7,77 @@
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
-    <main>
-      <h1>Character Counter Settings</h1>
-      <label>Character limit
-        <input id="limit" type="number" min="1" />
-      </label>
+    <main class="container">
+      <header class="header">
+        <h1>Character Counter — Settings</h1>
+        <p class="subtitle">Configure appearance and behavior for the in-editor character counter.</p>
+        <div class="header-controls">
+          <label class="dark-toggle"><input id="darkModeToggle" type="checkbox" /> Dark mode (options page only)</label>
+        </div>
+      </header>
+      <!-- duplicate preview removed -->
 
-      <label>Alignment
-        <select id="alignment">
-          <option value="left">Left</option>
-          <option value="center">Center</option>
-          <option value="right">Right</option>
-        </select>
-      </label>
+      <aside class="preview">
+        <h2>Live Preview</h2>
+        <div class="preview-box">
+          <div class="editor-mock">
+            <div class="toolbar-mock" id="toolbarPreview"></div>
+            <div class="editor-mock-area" contenteditable="true" id="editorPreview">Type here to preview...</div>
+          </div>
+        </div>
+        <p class="note">Tip: if the extension can't auto-detect a post limit, set it above.</p>
+      </aside>
 
-      <label><input id="showPercentage" type="checkbox" /> Show percentage instead of count</label>
+      <section class="panel">
+        <form id="settingsForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="limit">Character limit</label>
+              <input id="limit" type="number" min="1" />
+            </div>
 
-      <fieldset>
-        <legend>Thresholds (percent)</legend>
-        <label>Yellow at <input id="th-yellow" type="number" min="0" max="100" />%</label>
-        <label>Orange at <input id="th-orange" type="number" min="0" max="100" />%</label>
-        <label>Red at <input id="th-red" type="number" min="0" max="200" />%</label>
-      </fieldset>
+            <div class="field">
+              <label for="alignment">Alignment</label>
+              <select id="alignment">
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
 
-      <fieldset>
-        <legend>Colors</legend>
-        <label>Default <input id="col-default" type="color" /></label>
-        <label>Yellow <input id="col-yellow" type="color" /></label>
-        <label>Orange <input id="col-orange" type="color" /></label>
-        <label>Red <input id="col-red" type="color" /></label>
-      </fieldset>
+            <div class="field checkbox">
+              <label><input id="showPercentage" type="checkbox" /> Show percentage instead of count</label>
+            </div>
+          </div>
 
-      <div class="actions">
-        <button id="save">Save</button>
-        <button id="restore">Restore Defaults</button>
-      </div>
+          <div class="section-row">
+            <fieldset>
+              <legend>Thresholds (percent)</legend>
+              <div class="thresholds">
+                <label>Yellow at <input id="th-yellow" type="number" min="0" max="100" />%</label>
+                <label>Orange at <input id="th-orange" type="number" min="0" max="100" />%</label>
+                <label>Red at <input id="th-red" type="number" min="0" max="200" />%</label>
+              </div>
+            </fieldset>
 
-      <p class="note">Tip: if the extension can't auto-detect a post limit, set it here.</p>
+            <fieldset>
+              <legend>Colors</legend>
+              <div class="thresholds">
+                <label>Default <input id="col-default" type="color" /></label>
+                <label>Yellow <input id="col-yellow" type="color" /></label>
+                <label>Orange <input id="col-orange" type="color" /></label>
+                <label>Red <input id="col-red" type="color" /></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <button id="save" type="button" class="btn primary">Save</button>
+            <button id="restore" type="button" class="btn">Restore Defaults</button>
+          </div>
+        </form>
+      </section>
+
     </main>
     <script src="options.js"></script>
   </body>

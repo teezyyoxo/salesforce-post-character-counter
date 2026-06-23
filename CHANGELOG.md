@@ -46,6 +46,23 @@
 - Use presets when `findLimit()` cannot find a DOM-provided limit
 - Bump version to `0.1.8`
 
+## 0.1.9 - UI: options page refresh
+- Overhaul `options.html` with a modern, responsive layout and live preview
+- Add styling and instant-update preview via `options.js`
+- Bump version to `0.1.9`
+
+## 0.1.10 - Fix: options preview bugs
+- Clear preview placeholder on focus and restore on blur
+- Update preview counter live while typing and apply threshold color logic
+- Bump version to `0.1.10`
+
+## 0.1.11 - UI: preview resizing and color swatches
+- Add draggable resizer (bottom-left) with enable toggle and reset button for preview area
+- Prevent horizontal overflow by wrapping long pasted content in preview
+- Show color input swatches on load and update their backgrounds as values change
+- Move Live Preview higher on the page for better ergonomics
+- Bump version to `0.1.11`
+
 ## 0.1.0 - Initial draft
 - Scaffolded Chrome extension manifest and content script
 - Options UI for alignment, limit, percentage, thresholds and colors
