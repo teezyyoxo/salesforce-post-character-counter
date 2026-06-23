@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Salesforce Post Character Counter — Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Character Counter Settings</h1>
+      <label>Character limit
+        <input id="limit" type="number" min="1" />
+      </label>
+
+      <label>Alignment
+        <select id="alignment">
+          <option value="left">Far left</option>
+          <option value="center">Center</option>
+          <option value="right">Far right</option>
+        </select>
+      </label>
+
+      <label><input id="showPercentage" type="checkbox" /> Show percentage instead of count</label>
+
+      <fieldset>
+        <legend>Thresholds (percent)</legend>
+        <label>Yellow at <input id="th-yellow" type="number" min="0" max="100" />%</label>
+        <label>Orange at <input id="th-orange" type="number" min="0" max="100" />%</label>
+        <label>Red at <input id="th-red" type="number" min="0" max="200" />%</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Colors</legend>
+        <label>Default <input id="col-default" type="color" /></label>
+        <label>Yellow <input id="col-yellow" type="color" /></label>
+        <label>Orange <input id="col-orange" type="color" /></label>
+        <label>Red <input id="col-red" type="color" /></label>
+      </fieldset>
+
+      <div class="actions">
+        <button id="save">Save</button>
+        <button id="restore">Restore Defaults</button>
+      </div>
+
+      <p class="note">Tip: if the extension can't auto-detect a post limit, set it here.</p>
+    </main>
+    <script src="options.js"></script>
+  </body>
+  </html>

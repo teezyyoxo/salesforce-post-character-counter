@@ -1,0 +1,40 @@
+
+# Changelog
+
+## 0.1.1 - Dev: options UI link + debug/fallback
+- Add `options_ui` to `manifest.json` so Chrome shows the Options link in extension details
+- Add debug logging to `content-script.js` for detection diagnostics
+- Add a temporary floating counter fallback when a toolbar isn't detected (helps confirm script runs)
+- Bump extension version to `0.1.1`
+
+## 0.1.2 - Improve detection for Salesforce editor
+- Update `content-script.js` to target Salesforce/Quill editor elements (e.g. `.ql-editor[contenteditable]` and `.slds-rich-text-editor__toolbar`) and attach on focus
+- Remove floating fallback (use direct toolbar insertion)
+- Bump extension version to `0.1.2`
+
+## 0.1.3 - Fix: guard DOM handlers against non-element targets
+- Add element-type checks and try/catch around `focusin` handler to prevent errors when `e.target` is not an Element
+- Ensure event listeners are only attached to Element nodes
+- Bump extension version to `0.1.3`
+
+## 0.1.4 - Fix: honor specific Salesforce selectors
+- Attempt user-provided toolbar and editable selectors first (uses `#outerContainer` selector when present)
+- Prefer `.ql-editor` inside the editable container when attaching counter
+- More defensive querySelector usage and logging
+- Bump extension version to `0.1.4`
+
+## 0.1.5 - Fix: syntax error and top-level try/catch cleanup
+- Fix syntax error caused by mismatched try/catch in `content-script.js`
+- Wrap IIFE body in single `try { ... } catch (err) { ... }` to avoid parsing errors
+- Bump version to `0.1.5`
+
+## 0.1.6 - Fix: accurate initial count and first-character updates
+- Normalize editable text (strip zero-width chars and lone newlines) so empty Quill editors report 0 instead of 1
+- Use `requestAnimationFrame` to schedule updates after DOM changes so the first character is counted immediately
+- Add extra input-related event hooks (`keydown`, `compositionend`) and focus update
+- Bump version to `0.1.6`
+
+## 0.1.0 - Initial draft
+- Scaffolded Chrome extension manifest and content script
+- Options UI for alignment, limit, percentage, thresholds and colors
+- Heuristic editor detection and counter injection
