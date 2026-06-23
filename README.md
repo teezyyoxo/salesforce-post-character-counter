@@ -46,3 +46,9 @@ Planned enhancements and longer-term tasks. Each item has a simple identifier (T
 Notes:
 - Recent work completed: detection heuristics, host presets loading, Options UI overhaul (live preview, color swatches, dark mode), and locking behavior when a preset is detected.
 - Remaining priority work: add tests (TD-001d) and expand the host presets list (TD-002).
+
+## Test harness
+
+- A minimal test harness is included at `test/find_limit_test.html` to validate `findLimit()` detection logic against common DOM scenarios.
+- To run locally, open the file in your browser (e.g., `open test/find_limit_test.html` on macOS) and click "Run detection" — results will print in the Results pane.
+- The test page contains examples for: `data-limit`, `maxlength`, nearby `textarea[maxlength]`, and a no-hint fallback.
