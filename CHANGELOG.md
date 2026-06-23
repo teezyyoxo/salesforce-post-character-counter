@@ -41,6 +41,11 @@
 - Rename alignment labels from "Far left/right" to "Left/Right"
 - Bump version to `0.1.7`
 
+## 0.1.8 - Feature: host presets (TD-001c)
+- Add `presets.json` and load host presets at runtime (via `chrome.runtime.getURL`) to map hostnames to known limits
+- Use presets when `findLimit()` cannot find a DOM-provided limit
+- Bump version to `0.1.8`
+
 ## 0.1.0 - Initial draft
 - Scaffolded Chrome extension manifest and content script
 - Options UI for alignment, limit, percentage, thresholds and colors

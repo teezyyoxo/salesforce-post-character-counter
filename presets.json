@@ -1,0 +1,14 @@
+{
+    "presets": [
+        {
+            "id": "salesforce-default",
+            "hosts": [
+                "salesforce.com",
+                "force.com",
+                "lightning.force.com"
+            ],
+            "limit": 10000,
+            "notes": "Default Salesforce/Force.com Post limit (TD-001a)"
+        }
+    ]
+}

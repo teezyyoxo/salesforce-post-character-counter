@@ -13,6 +13,27 @@
   };
 
   let settings = Object.assign({}, DEFAULT_SETTINGS);
+  let PRESET_LIMITS = [];
+
+  function loadPresets() {
+    return new Promise((resolve) => {
+      try {
+        const url = chrome && chrome.runtime && chrome.runtime.getURL ? chrome.runtime.getURL('presets.json') : 'presets.json';
+        fetch(url).then(r => r.json()).then(data => {
+          if (data && Array.isArray(data.presets)) {
+            PRESET_LIMITS = data.presets;
+          }
+          resolve(PRESET_LIMITS);
+        }).catch(err => {
+          try { console.warn('sf-char-counter: failed to load presets.json', err); } catch (e) {}
+          resolve([]);
+        });
+      } catch (err) {
+        try { console.warn('sf-char-counter: loadPresets error', err); } catch (e) {}
+        resolve([]);
+      }
+    });
+  }
 
   function loadSettings() {
     return new Promise((resolve) => {
@@ -252,7 +273,7 @@
   }
 
   // Initialize
-  loadSettings().then((s) => {
+  Promise.all([loadSettings(), loadPresets()]).then(([s]) => {
     settings = s;
     // Detect limit heuristically: look for maxlength or data-limit on editable
     let limit = settings.limit || DEFAULT_LIMIT;
