@@ -40,7 +40,6 @@ Planned enhancements and longer-term tasks. Each item has a simple identifier (T
 | TD-001c | Host presets mapping | Provide a small `presets.json` mapping hostnames → selectors → limits and load it at runtime. | High | Completed |
 | TD-001e | Lock limit when preset detected | When a host preset is detected, mark the option as locked and surface the preset source in Options UI. | Medium | Completed |
 | TD-001d | Tests & verification harness | Add unit tests and a small verification page/harness to validate `findLimit()` across example DOM snippets. | High | Planned |
-
 | TD-002 | Per-site presets (extend) | Expand `presets.json` with additional hosts and provide an import/export UI for site presets. | Medium | Planned |
 | TD-003 | Theming & options UI polish | Finish dark-mode support, color swatches, live preview, and compact display options in the Options page. | Low | Mostly completed |
 
