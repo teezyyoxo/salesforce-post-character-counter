@@ -63,6 +63,15 @@
 - Move Live Preview higher on the page for better ergonomics
 - Bump version to `0.1.11`
 
+## 0.1.12 - UI: dark mode, preset locking, test harness
+- Add dark-mode toggle for Options page and update CSS variables for full coverage
+- Remove preview resizer and simplify preview layout (automatic sizing)
+- Fix color swatch rendering across browsers and themes
+- Implement TD-001e: detect host presets and lock `Character limit` input in Options; persist detection to `chrome.storage.sync`
+- Restore consistent preview/settings layout and align preview height with settings panel
+- Add a minimal test harness `test/find_limit_test.html` to validate `findLimit()` detection scenarios
+- Bump version to `0.1.12`
+
 ## 0.1.0 - Initial draft
 - Scaffolded Chrome extension manifest and content script
 - Options UI for alignment, limit, percentage, thresholds and colors

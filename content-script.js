@@ -203,14 +203,14 @@
       if (valid.length) return valid[0];
 
       // 4) host presets (TD-001a): known limits per host
-      const host = location.hostname || '';
-      const PRESET_LIMITS = [
-        {match: 'salesforce.com', limit: 10000},
-        {match: 'force.com', limit: 10000},
-        {match: 'lightning.force.com', limit: 10000}
-      ];
-      for (const p of PRESET_LIMITS) {
-        if (host.indexOf(p.match) !== -1) return p.limit;
+      const host = (location && location.hostname) ? location.hostname : '';
+      if (Array.isArray(PRESET_LIMITS) && PRESET_LIMITS.length) {
+        for (const p of PRESET_LIMITS) {
+          if (p && p.match && host.indexOf(p.match) !== -1) {
+            // return an object to indicate a preset match
+            return { limit: p.limit, preset: p.match };
+          }
+        }
       }
 
       return settings.limit || 10000;
@@ -234,7 +234,27 @@
         try {
           if (!(found.toolbar instanceof Element)) throw new Error('toolbar is not an Element');
           if (!(found.editable instanceof Element)) throw new Error('editable is not an Element');
-          const computedLimit = findLimit(found.editable, found.toolbar) || limit;
+          const computed = findLimit(found.editable, found.toolbar) || limit;
+          // if computed is an object returned from preset matching, persist detection
+          let computedLimit = computed;
+          try {
+            if (computed && typeof computed === 'object' && Number.isFinite(computed.limit)) {
+              computedLimit = computed.limit;
+              // persist detected preset to chrome.storage.sync for the options page
+              try {
+                if (chrome && chrome.storage && chrome.storage.sync) {
+                  chrome.storage.sync.set({ detectedPreset: { host: location.hostname, preset: computed.preset, limit: computed.limit } });
+                }
+              } catch (e) {
+                try { console.warn('sf-char-counter: failed to persist detectedPreset', e); } catch (ee) {}
+              }
+            } else {
+              // no preset detected: clear any previous detectedPreset info for this host
+              try { if (chrome && chrome.storage && chrome.storage.sync) chrome.storage.sync.remove('detectedPreset'); } catch (e) {}
+            }
+          } catch (e) {
+            // ignore storage errors
+          }
           attached = attachToToolbar(found.toolbar, found.editable, computedLimit);
           if (attached) {
             const events = ['input', 'keyup', 'keydown', 'paste', 'change', 'compositionend'];

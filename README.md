@@ -32,11 +32,18 @@ MIT
 ## Roadmap
 
 Planned enhancements and longer-term tasks. Each item has a simple identifier (TD-xxx) for tracking.
-
 | ID | Title | Description | Priority | Status |
 |---:|:------|:------------|:--------:|:------|
-| TD-001 | Detect site character limit | Parse the editor DOM (attributes, maxlength, or site-specific rules) and use the actual per-site limit instead of a broad default. Hardcode known Salesforce limit and fall back to parsing when available. | High | Planned |
-| TD-002 | Per-site presets | Maintain a small mapping of site hostnames → editor selectors and limits so the extension works out-of-the-box on multiple sites (Salesforce, internal apps). | Medium | Planned |
-| TD-003 | Theming & compact display | Add slimmer, theme-aware styles and an option for compact display (icon-only or small badge). | Low | Planned |
+| TD-001 | Detect site character limit (umbrella) | Ensure the extension detects the actual per-site editor limit instead of relying only on a global default. Broken into subtasks below. | High | In progress |
+| TD-001a | Gather known Salesforce limit | Record and document known limits for Salesforce/Lightning editors and cluster-host patterns. | High | Completed |
+| TD-001b | DOM parsing for maxlength/attributes | Parse editor, toolbar, and nearby inputs for maxlength, data-* attributes, ARIA values and other hints. | High | Completed |
+| TD-001c | Host presets mapping | Provide a small `presets.json` mapping hostnames → selectors → limits and load it at runtime. | High | Completed |
+| TD-001e | Lock limit when preset detected | When a host preset is detected, mark the option as locked and surface the preset source in Options UI. | Medium | Completed |
+| TD-001d | Tests & verification harness | Add unit tests and a small verification page/harness to validate `findLimit()` across example DOM snippets. | High | Planned |
 
-If you'd like, I can break TD-001 into implementation sub-tasks and schedule them into milestones.
+| TD-002 | Per-site presets (extend) | Expand `presets.json` with additional hosts and provide an import/export UI for site presets. | Medium | Planned |
+| TD-003 | Theming & options UI polish | Finish dark-mode support, color swatches, live preview, and compact display options in the Options page. | Low | Mostly completed |
+
+Notes:
+- Recent work completed: detection heuristics, host presets loading, Options UI overhaul (live preview, color swatches, dark mode), and locking behavior when a preset is detected.
+- Remaining priority work: add tests (TD-001d) and expand the host presets list (TD-002).

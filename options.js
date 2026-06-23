@@ -22,6 +22,28 @@ function load() {
     by('col-orange').value = s.colors.orange;
     by('col-red').value = s.colors.red;
     updatePreviewFromSettings(s);
+    // check for detected preset and update UI
+    updateDetectedPresetUI();
+  });
+}
+
+function updateDetectedPresetUI(){
+  const notice = by('presetNotice');
+  const limitInput = by('limit');
+  if (!notice || !limitInput) return;
+  chrome.storage.sync.get(['detectedPreset'], (res) => {
+    const d = res && res.detectedPreset;
+    if (d && d.preset) {
+      notice.style.display = 'block';
+      notice.textContent = `Using site preset (${d.preset}) — limit locked at ${d.limit}.`; 
+      limitInput.disabled = true;
+      limitInput.title = 'Locked by detected site preset';
+    } else {
+      notice.style.display = 'none';
+      notice.textContent = '';
+      limitInput.disabled = false;
+      limitInput.title = '';
+    }
   });
 }
 

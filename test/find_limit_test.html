@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>findLimit() Test Harness</title>
+  <style>
+    body{font-family:system-ui,Arial;padding:20px;background:#f7fafc;color:#0b1220}
+    .box{border:1px solid #e2e8f0;padding:12px;border-radius:8px;margin-bottom:12px;background:#fff}
+    .sample{padding:8px;border:1px dashed #cbd5e1;margin-top:6px}
+    pre{background:#0b1220;color:#e6eef6;padding:8px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <h1>findLimit() Test Harness</h1>
+  <p>This page contains sample editable elements to exercise the extension's <code>findLimit()</code> heuristics.</p>
+
+  <div class="box">
+    <h3>1) contenteditable with data-limit</h3>
+    <div class="sample" id="editable1" contenteditable="true" data-limit="250">Editable area (data-limit=250)</div>
+  </div>
+
+  <div class="box">
+    <h3>2) contenteditable with maxlength attribute</h3>
+    <div class="sample" id="editable2" contenteditable="true" maxlength="140">Editable (maxlength=140)</div>
+  </div>
+
+  <div class="box">
+    <h3>3) Nearby textarea with maxlength</h3>
+    <form id="f1">
+      <textarea id="nearby" maxlength="512" placeholder="nearby textarea (maxlength=512)"></textarea>
+      <div class="sample" id="editable3" contenteditable="true">Editor inside form</div>
+    </form>
+  </div>
+
+  <div class="box">
+    <h3>4) No hints (should fallback to default)</h3>
+    <div class="sample" id="editable4" contenteditable="true">No hints here</div>
+  </div>
+
+  <button id="run">Run detection</button>
+  <h3>Results</h3>
+  <pre id="out">(no results yet)</pre>
+
+  <script>
+    // Minimal adaptation of the extension's findLimit() for testing DOM scenarios.
+    function findLimit(editable){
+      const candidates = [];
+      if (!editable) return null;
+      try{
+        const m = editable.getAttribute && (editable.getAttribute('maxlength') || editable.getAttribute('maxLength'));
+        if (m) candidates.push(parseInt(m,10));
+        const dm = editable.dataset && (editable.dataset.maxlength || editable.dataset.limit || editable.dataset.maxLength);
+        if (dm) candidates.push(parseInt(dm,10));
+        const nearby = editable.closest ? editable.closest('form, section, .slds-rich-text-area, .ql-container') : null;
+        if (nearby){
+          const t = nearby.querySelector('textarea[maxlength], input[maxlength]');
+          if (t) candidates.push(parseInt(t.getAttribute('maxlength'),10));
+        }
+        const ar = editable.getAttribute && (editable.getAttribute('aria-valuemax') || editable.getAttribute('data-aria-max') || editable.getAttribute('data-max'));
+        if (ar) candidates.push(parseInt(ar,10));
+      }catch(e){/*ignore*/}
+      const valid = candidates.filter(n=>Number.isFinite(n) && n>0);
+      if (valid.length) return valid[0];
+      // host presets (simple): simulate salesforce host
+      const host = window.location.hostname || '';
+      const PRESET_LIMITS = [ {match: 'example.com', limit: 10000} ];
+      for (const p of PRESET_LIMITS){ if (host.indexOf(p.match)!==-1) return p.limit; }
+      return null;
+    }
+
+    function showResult(id){
+      const el = document.getElementById(id);
+      const out = document.getElementById('out');
+      const res = findLimit(el);
+      out.textContent += '\n' + id + ' => ' + String(res);
+    }
+
+    document.getElementById('run').addEventListener('click', ()=>{
+      const out = document.getElementById('out');
+      out.textContent = '';
+      ['editable1','editable2','editable3','editable4'].forEach(showResult);
+    });
+  </script>
+</body>
+</html>
