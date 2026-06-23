@@ -60,7 +60,7 @@ Notes:
 - Recent work completed: detection heuristics, host presets loading, options UI overhaul (live preview, color swatches, dark mode), and locking behavior when a preset is detected (although for Salesforce, at the time of writing, it is currently preset at 10,000 characters)
 - Remaining priority work: add tests (TD-001d) and expand the host presets list (TD-002).
 
-## Test harness
+## Test harness (developers only)
 
 - A minimal test harness is included at `test/find_limit_test.html` to validate `findLimit()` detection logic against common DOM scenarios.
 - To run locally, open the file in your browser (e.g., `open test/find_limit_test.html` on macOS) and click "Run detection" — results will print in the Results pane.
