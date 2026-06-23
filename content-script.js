@@ -72,6 +72,9 @@
         case 'center':
           counter.style.margin = '0 auto';
           break;
+        case 'right':
+          counter.style.marginLeft = 'auto';
+          break;
         default:
           counter.style.marginLeft = '8px';
       }
@@ -142,6 +145,60 @@
     return null;
   }
 
+  // Try to determine a character limit from the editor or surrounding DOM.
+  function findLimit(editable, toolbar) {
+    try {
+      // 1) check direct maxlength attributes
+      const candidates = [];
+      if (editable && editable.getAttribute) {
+        const m = editable.getAttribute('maxlength') || editable.getAttribute('maxLength');
+        if (m) candidates.push(parseInt(m, 10));
+        const dm = editable.dataset && (editable.dataset.maxlength || editable.dataset.limit || editable.dataset.maxLength);
+        if (dm) candidates.push(parseInt(dm, 10));
+      }
+      if (toolbar && toolbar.getAttribute) {
+        const tm = toolbar.getAttribute('data-maxlength') || toolbar.getAttribute('data-limit');
+        if (tm) candidates.push(parseInt(tm, 10));
+      }
+
+      // 2) search nearby for inputs/textarea with maxlength
+      const nearby = (editable && editable.closest) ? editable.closest('form, section, .slds-rich-text-area, .ql-container') : null;
+      if (nearby) {
+        const t = nearby.querySelector('textarea[maxlength], input[maxlength]');
+        if (t) {
+          const attr = t.getAttribute('maxlength');
+          if (attr) candidates.push(parseInt(attr, 10));
+        }
+      }
+
+      // 3) check ARIA or other attributes
+      if (editable && editable.getAttribute) {
+        const ar = editable.getAttribute('aria-valuemax') || editable.getAttribute('data-aria-max') || editable.getAttribute('data-max');
+        if (ar) candidates.push(parseInt(ar, 10));
+      }
+
+      // sanitize and pick first sensible candidate
+      const valid = candidates.filter(n => Number.isFinite(n) && n > 0);
+      if (valid.length) return valid[0];
+
+      // 4) host presets (TD-001a): known limits per host
+      const host = location.hostname || '';
+      const PRESET_LIMITS = [
+        {match: 'salesforce.com', limit: 10000},
+        {match: 'force.com', limit: 10000},
+        {match: 'lightning.force.com', limit: 10000}
+      ];
+      for (const p of PRESET_LIMITS) {
+        if (host.indexOf(p.match) !== -1) return p.limit;
+      }
+
+      return settings.limit || 10000;
+    } catch (err) {
+      try { console.warn('sf-char-counter: findLimit failed', err); } catch (e) {}
+      return settings.limit || 10000;
+    }
+  }
+
   function observeAndInject(limit) {
     let attached = null;
     function tryAttach() {
@@ -156,7 +213,8 @@
         try {
           if (!(found.toolbar instanceof Element)) throw new Error('toolbar is not an Element');
           if (!(found.editable instanceof Element)) throw new Error('editable is not an Element');
-          attached = attachToToolbar(found.toolbar, found.editable, limit);
+          const computedLimit = findLimit(found.editable, found.toolbar) || limit;
+          attached = attachToToolbar(found.toolbar, found.editable, computedLimit);
           if (attached) {
             const events = ['input', 'keyup', 'keydown', 'paste', 'change', 'compositionend'];
             const updater = () => requestAnimationFrame(() => { try { attached.update(); } catch (e) { /* ignore */ } });

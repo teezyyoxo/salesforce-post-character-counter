@@ -34,6 +34,13 @@
 - Add extra input-related event hooks (`keydown`, `compositionend`) and focus update
 - Bump version to `0.1.6`
 
+## 0.1.7 - Feature: limit detection + alignment label fix
+- Add `findLimit()` to parse `maxlength`, `data-*` attributes, ARIA attributes, and nearby inputs to detect per-editor limits (TD-001b)
+- Add host preset mapping for Salesforce domains (TD-001a) with default limit 10000
+- Fix alignment handling so `right` positions the counter on the right
+- Rename alignment labels from "Far left/right" to "Left/Right"
+- Bump version to `0.1.7`
+
 ## 0.1.0 - Initial draft
 - Scaffolded Chrome extension manifest and content script
 - Options UI for alignment, limit, percentage, thresholds and colors
