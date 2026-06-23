@@ -16,9 +16,15 @@ Lightweight Chrome extension that injects a configurable character counter into 
 - Attempts to detect per-editor maxlength; fallback to configured default limit
 
 ## Installation (developer)
-1. Open Chrome and go to chrome://extensions
-2. Enable "Developer mode"
-3. Click "Load unpacked" and select this repository folder
+1. Clone this repo
+2. Open Chrome and go to chrome://extensions
+3. Enable "Developer mode"
+4. Click "Load unpacked" and select this repository folder
+
+## To update the extension (when applicable)
+1. Clone the repo again, or run a `git pull` within the folder.
+2. Open Chrome and go to chrome://extensions.
+3. Click "Update" at the top left corner of the page, or click the refresh button on the extension's tile.
 
 ## Usage
 - Open Salesforce where you compose a Post. The counter will appear near the editor toolbar.
@@ -26,6 +32,7 @@ Lightweight Chrome extension that injects a configurable character counter into 
 
 ## Developer notes
 - Content script uses heuristics to find contenteditable areas and nearby toolbar elements. If the extension can't locate the right spot for your Salesforce layout, use the options to set a sensible limit and try reloading the page.
+- Feel free to file any bugs or problems as an Issue and I will get to it... eventually.
 
 ## Files
 - `manifest.json` — extension manifest
