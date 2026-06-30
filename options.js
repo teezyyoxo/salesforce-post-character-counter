@@ -82,7 +82,7 @@ let previewSettings = null;
 function updatePreviewCounter(text) {
   if (!previewCounter || !previewSettings) return;
   const s = previewSettings;
-  const count = (text || '').replace(/\u200B|\uFEFF/g, '').replace(/\n/g, '').trim().length;
+  const count = (text || '').replace(/\u200B|\uFEFF/g, '').replace(/\r\n?/g, '\n').length;
   const pct = s.limit > 0 ? Math.round((count / s.limit) * 100) : 0;
   if (s.showPercentage) previewCounter.textContent = `${pct}%`;
   else previewCounter.textContent = `${count}/${s.limit}`;

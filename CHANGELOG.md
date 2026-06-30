@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 0.1.0 - Initial draft
+- Scaffolded Chrome extension manifest and content script
+- Options UI for alignment, limit, percentage, thresholds and colors
+- Heuristic editor detection and counter injection
+
 ## 0.1.1 - Dev: options UI link + debug/fallback
 - Add `options_ui` to `manifest.json` so Chrome shows the Options link in extension details
 - Add debug logging to `content-script.js` for detection diagnostics
@@ -55,6 +60,8 @@
 - Clear preview placeholder on focus and restore on blur
 - Update preview counter live while typing and apply threshold color logic
 - Bump version to `0.1.10`
+- Add a minimal test harness `test/find_limit_test.html` to validate `findLimit()` detection scenarios
+- Bump version to `0.1.12`
 
 ## 0.1.11 - UI: preview resizing and color swatches
 - Add draggable resizer (bottom-left) with enable toggle and reset button for preview area
@@ -69,10 +76,20 @@
 - Fix color swatch rendering across browsers and themes
 - Implement TD-001e: detect host presets and lock `Character limit` input in Options; persist detection to `chrome.storage.sync`
 - Restore consistent preview/settings layout and align preview height with settings panel
-- Add a minimal test harness `test/find_limit_test.html` to validate `findLimit()` detection scenarios
-- Bump version to `0.1.12`
 
-## 0.1.0 - Initial draft
-- Scaffolded Chrome extension manifest and content script
-- Options UI for alignment, limit, percentage, thresholds and colors
-- Heuristic editor detection and counter injection
+## 0.1.13 - Fix: rich-text newline and code block character counting
+- Preserve newline characters when counting rich-text editor content so code blocks and multi-line posts match backend submission length.
+- Normalize CRLF sequences and avoid undercounting editor text.
+- Bump version to `0.1.13`
+
+## 0.1.14 - Patch: restore counter visibility
+- Fix counter rendering so the injected toolbar element appears again after the rich-text normalization change.
+- Bump version to `0.1.14`
+
+
+
+
+
+
+
+

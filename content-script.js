@@ -102,7 +102,9 @@
     }
 
     function update() {
-      const text = (editable && getEditableText(editable)) || '';
+      let text = getEditableText(editable);
+      const mirror = findSubmissionMirrorText(editable);
+      if (mirror) text = mirror;
       const count = text.length;
       const percent = limit > 0 ? Math.round((count / limit) * 100) : 0;
       counter.textContent = formatCount(count, limit);
@@ -118,15 +120,64 @@
   function getEditableText(el) {
     if (!el) return '';
     if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') return el.value || '';
-    // Normalize contenteditable/Quill content:
-    // - strip zero-width and non-printable characters
-    // - treat a single empty paragraph (\n or whitespace) as empty
-    let text = el.innerText || el.textContent || '';
-    // remove zero-width spaces and BOM
+
+    const BLOCK_TAGS = new Set(['div','p','li','tr','table','thead','tbody','tfoot','th','td','section','article','header','footer','aside','blockquote','pre','code','h1','h2','h3','h4','h5','h6']);
+    let text = '';
+
+    function appendText(value) {
+      if (!value) return;
+      text += value;
+    }
+
+    function appendNewline() {
+      if (!text.endsWith('\n')) text += '\n';
+    }
+
+    function walk(node) {
+      if (!node) return;
+      if (node.nodeType === Node.TEXT_NODE) {
+        appendText(node.data);
+        return;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+      const tag = node.tagName.toLowerCase();
+      if (tag === 'br') {
+        appendNewline();
+        return;
+      }
+
+      const isBlock = BLOCK_TAGS.has(tag);
+      if (isBlock) appendNewline();
+
+      for (let child = node.firstChild; child; child = child.nextSibling) {
+        walk(child);
+      }
+
+      if (isBlock) appendNewline();
+    }
+
+    walk(el);
     text = text.replace(/\u200B|\uFEFF/g, '');
-    // Quill often leaves a lone newline for empty editors
-    text = text.replace(/\n/g, '');
-    return text.trim();
+    text = text.replace(/\r\n?/g, '\n');
+    return text;
+  }
+
+  function findSubmissionMirrorText(editable) {
+    if (!editable || !editable.closest) return null;
+    const container = editable.closest('form, section, .slds-rich-text-area, .ql-container, .slds-rich-text-editor, .slds-form-element') || document.body;
+    const candidates = Array.from(container.querySelectorAll('textarea, input[type="hidden"], input[type="text"], input[type="search"]'));
+    const fieldNames = /body|post|message|comment|description|content|feed|input/i;
+    for (const input of candidates) {
+      if (input === editable) continue;
+      const value = input.value || '';
+      if (!value) continue;
+      const name = ((input.name || '') + '|' + (input.id || '')).toLowerCase();
+      if (fieldNames.test(name) || input.tagName === 'TEXTAREA' || input.type === 'hidden') {
+        return value;
+      }
+    }
+    return null;
   }
 
   function detectToolbarAndEditable() {
