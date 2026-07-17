@@ -37,6 +37,7 @@ Lightweight Chrome extension that injects a configurable character counter into 
 ## Files
 - `manifest.json` — extension manifest
 - `content-script.js` — logic that detects editors and injects counter
+- `presets.json` — host-specific character-limit presets loaded at runtime
 - `options.html`, `options.js`, `options.css` — settings UI stored in `chrome.storage.sync`
 
 ## License
@@ -50,7 +51,7 @@ Planned enhancements and longer-term tasks.
 | TD-001 | Detect site character limit (umbrella) | Ensure the extension detects the actual per-site editor limit instead of relying only on a global default. Broken into subtasks below. | High | In progress |
 | TD-001a | Gather known Salesforce limit | Record and document known limits for Salesforce/Lightning editors and cluster-host patterns. | High | Completed |
 | TD-001b | DOM parsing for maxlength/attributes | Parse editor, toolbar, and nearby inputs for maxlength, data-* attributes, ARIA values and other hints. | High | Completed |
-| TD-001c | Host presets mapping | Provide a small `presets.json` mapping hostnames → selectors → limits and load it at runtime. | High | Completed |
+| TD-001c | Host presets mapping | Provide a small `presets.json` mapping hostnames → limits and load it at runtime. | High | Completed |
 | TD-001e | Lock limit when preset detected | When a host preset is detected, mark the option as locked and surface the preset source in Options UI. | Medium | Completed |
 | TD-001d | Tests & verification harness | Add unit tests and a small verification page/harness to validate `findLimit()` across example DOM snippets. | High | Planned |
 | TD-002 | Per-site presets (extend) | Expand `presets.json` with additional hosts and provide an import/export UI for site presets. | Medium | Planned |

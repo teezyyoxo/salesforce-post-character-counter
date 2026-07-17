@@ -18,8 +18,12 @@
   function loadPresets() {
     return new Promise((resolve) => {
       try {
-        const url = chrome && chrome.runtime && chrome.runtime.getURL ? chrome.runtime.getURL('presets.json') : 'presets.json';
-        fetch(url).then(r => r.json()).then(data => {
+        const runtime = typeof chrome !== 'undefined' && chrome.runtime;
+        const url = runtime && runtime.getURL ? runtime.getURL('presets.json') : 'presets.json';
+        fetch(url).then((response) => {
+          if (!response.ok) throw new Error(`HTTP ${response.status} while loading presets.json`);
+          return response.json();
+        }).then(data => {
           if (data && Array.isArray(data.presets)) {
             PRESET_LIMITS = data.presets;
           }
@@ -257,9 +261,11 @@
       const host = (location && location.hostname) ? location.hostname : '';
       if (Array.isArray(PRESET_LIMITS) && PRESET_LIMITS.length) {
         for (const p of PRESET_LIMITS) {
-          if (p && p.match && host.indexOf(p.match) !== -1) {
+          const hosts = p && Array.isArray(p.hosts) ? p.hosts : (p && p.match ? [p.match] : []);
+          const matchedHost = hosts.find((presetHost) => presetHost && (host === presetHost || host.endsWith(`.${presetHost}`)));
+          if (matchedHost) {
             // return an object to indicate a preset match
-            return { limit: p.limit, preset: p.match };
+            return { limit: p.limit, preset: matchedHost };
           }
         }
       }

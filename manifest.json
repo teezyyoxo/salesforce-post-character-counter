@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Salesforce Post Character Counter",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "description": "Displays a configurable character counter on Salesforce Post textboxes.",
     "permissions": [
         "storage"
@@ -10,6 +10,18 @@
         "*://*.salesforce.com/*",
         "*://*.force.com/*",
         "*://*.lightning.force.com/*"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "presets.json"
+            ],
+            "matches": [
+                "*://*.salesforce.com/*",
+                "*://*.force.com/*",
+                "*://*.lightning.force.com/*"
+            ]
+        }
     ],
     "content_scripts": [
         {

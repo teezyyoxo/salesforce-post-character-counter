@@ -86,6 +86,11 @@
 - Fix counter rendering so the injected toolbar element appears again after the rich-text normalization change.
 - Bump version to `0.1.14`
 
+## 0.1.15 - Fix: load runtime presets in content scripts
+- Declare `presets.json` as a web-accessible resource for Salesforce and Force.com pages so Chrome content scripts can fetch it successfully.
+- Validate the preset fetch response before parsing JSON and retain the existing fallback when loading fails.
+- Fix host preset matching to support the `hosts` array used by `presets.json`, while retaining compatibility with the legacy `match` property.
+- Bump extension version to `0.1.15`
 
 
 
