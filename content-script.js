@@ -18,22 +18,25 @@
   function loadPresets() {
     return new Promise((resolve) => {
       try {
-        const runtime = typeof chrome !== 'undefined' && chrome.runtime;
-        const url = runtime && runtime.getURL ? runtime.getURL('presets.json') : 'presets.json';
-        fetch(url).then((response) => {
-          if (!response.ok) throw new Error(`HTTP ${response.status} while loading presets.json`);
-          return response.json();
-        }).then(data => {
-          if (data && Array.isArray(data.presets)) {
-            PRESET_LIMITS = data.presets;
+        const runtime = typeof chrome !== 'undefined' ? chrome.runtime : null;
+        if (!runtime || !runtime.sendMessage) {
+          resolve([]);
+          return;
+        }
+
+        runtime.sendMessage({ type: 'loadPresets' }, (response) => {
+          // A missing/temporarily unavailable service worker should not stop
+          // the counter; settings.limit remains the fallback.
+          if (chrome.runtime.lastError) {
+            resolve([]);
+            return;
+          }
+          if (response && Array.isArray(response.presets)) {
+            PRESET_LIMITS = response.presets;
           }
           resolve(PRESET_LIMITS);
-        }).catch(err => {
-          try { console.warn('sf-char-counter: failed to load presets.json', err); } catch (e) {}
-          resolve([]);
         });
       } catch (err) {
-        try { console.warn('sf-char-counter: loadPresets error', err); } catch (e) {}
         resolve([]);
       }
     });

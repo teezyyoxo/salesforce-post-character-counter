@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Salesforce Post Character Counter",
-    "version": "0.1.15",
+    "version": "0.1.16",
     "description": "Displays a configurable character counter on Salesforce Post textboxes.",
     "permissions": [
         "storage"
@@ -40,5 +40,8 @@
     "options_ui": {
         "page": "options.html",
         "open_in_tab": true
+    },
+    "background": {
+        "service_worker": "background.js"
     }
 }
