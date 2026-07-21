@@ -187,41 +187,30 @@
     return null;
   }
 
-  function detectToolbarAndEditable() {
-    // First try page-specific selectors provided from inspection
-    try {
-      const toolbarSelector = '#outerContainer > div.slds-form-element.lightningInputRichText.forceChatterMessageBodyInputRichTextEditor > div > div.slds-rich-text-editor__toolbar.slds-shrink-none.slds-rich-text-editor__toolbar_bottom';
-      const editableContainerSelector = '#outerContainer > div.slds-form-element.lightningInputRichText.forceChatterMessageBodyInputRichTextEditor > div';
-      const toolbarEl = document.querySelector(toolbarSelector);
-      const editableParent = document.querySelector(editableContainerSelector);
-      if (toolbarEl && editableParent) {
-        // prefer the actual ql-editor inside the editableParent
-        const editableEl = editableParent.querySelector('.ql-editor') || editableParent.querySelector('[contenteditable="true"]') || editableParent;
-        if (editableEl) return { toolbar: toolbarEl, editable: editableEl };
-      }
-    } catch (err) {
-      try { console.warn('sf-char-counter: user selector query failed', err); } catch (e) {}
-    }
-    // Target Salesforce/Quill editors specifically using observed classes
-    const selectors = [
-      '.ql-editor[contenteditable="true"][data-placeholder="Share an update..."]',
-      '.slds-rich-text-area__content[contenteditable="true"]',
-      '.ql-editor[contenteditable="true"]'
-    ];
-    const editables = Array.from(document.querySelectorAll(selectors.join(',')));
-    for (const editable of editables) {
-      // prefer a nearby rich-text editor container
-      let container = editable.closest('.slds-rich-text-area, .slds-rich-text-editor, .ql-container, section, form');
-      if (!container) container = editable.parentElement;
-      if (!container) continue;
-      // find the toolbar within that container
-      const toolbar = container.querySelector('.slds-rich-text-editor__toolbar, .slds-rich-text-editor__toolbar_bottom, [role="toolbar"]');
-      if (toolbar) return { toolbar, editable };
-      // fallback: look for the nearest toolbar sibling in the parent
-      const siblingToolbar = Array.from(container.children).find(n => n && n.getAttribute && (n.getAttribute('role') === 'toolbar' || (n.querySelector && n.querySelector('button'))));
-      if (siblingToolbar) return { toolbar: siblingToolbar, editable };
+  const EDITABLE_SELECTOR = '.slds-rich-text-area__content[contenteditable="true"], .ql-editor[contenteditable="true"]';
+  const TOOLBAR_SELECTOR = '.slds-rich-text-editor__toolbar, .slds-rich-text-editor__toolbar_bottom, [role="toolbar"]';
+
+  function findToolbarForEditable(editable) {
+    // The toolbar is not consistently nested under the Quill container. Walk up
+    // through the local editor/form/modal hierarchy so Edit Post dialogs and the
+    // main composer are treated as separate editor instances.
+    for (let container = editable.parentElement; container && container !== document.body; container = container.parentElement) {
+      const toolbar = container.querySelector(TOOLBAR_SELECTOR);
+      if (toolbar) return toolbar;
+      const siblingToolbar = Array.from(container.children).find((child) =>
+        child instanceof Element && (child.matches(TOOLBAR_SELECTOR) || child.getAttribute('role') === 'toolbar')
+      );
+      if (siblingToolbar) return siblingToolbar;
+      if (container.matches('form, [role="dialog"], .uiModal')) break;
     }
     return null;
+  }
+
+  function findEditors() {
+    return Array.from(document.querySelectorAll(EDITABLE_SELECTOR)).map((editable) => ({
+      editable,
+      toolbar: findToolbarForEditable(editable)
+    })).filter(({ toolbar }) => toolbar);
   }
 
   // Try to determine a character limit from the editor or surrounding DOM.
@@ -281,17 +270,11 @@
   }
 
   function observeAndInject(limit) {
-    let attached = null;
-    function tryAttach() {
-      let found = null;
+    const attachments = new WeakMap();
+
+    function attachEditor(found) {
+      if (attachments.has(found.editable)) return;
       try {
-        found = detectToolbarAndEditable();
-        console.log('sf-char-counter: detectToolbar result', !!found, found && { toolbarTag: found.toolbar && found.toolbar.tagName, editableTag: found.editable && found.editable.tagName });
-      } catch (err) {
-        try { console.error('sf-char-counter: detectToolbarAndEditable threw', err); } catch (e) {}
-      }
-      if (found) {
-        try {
           if (!(found.toolbar instanceof Element)) throw new Error('toolbar is not an Element');
           if (!(found.editable instanceof Element)) throw new Error('editable is not an Element');
           const computed = findLimit(found.editable, found.toolbar) || limit;
@@ -315,18 +298,29 @@
           } catch (e) {
             // ignore storage errors
           }
-          attached = attachToToolbar(found.toolbar, found.editable, computedLimit);
+          const attached = attachToToolbar(found.toolbar, found.editable, computedLimit);
           if (attached) {
+            attachments.set(found.editable, attached);
             const events = ['input', 'keyup', 'keydown', 'paste', 'change', 'compositionend'];
             const updater = () => requestAnimationFrame(() => { try { attached.update(); } catch (e) { /* ignore */ } });
             events.forEach(ev => found.editable.addEventListener(ev, updater));
             // also update on focus to reflect placeholder changes
             found.editable.addEventListener('focus', updater);
           }
-        } catch (err) {
-          try { console.error('sf-char-counter: attach failed', err, 'found=', found); } catch (e) {}
-        }
+      } catch (err) {
+        try { console.error('sf-char-counter: attach failed', err, 'found=', found); } catch (e) {}
       }
+    }
+
+    function tryAttach(editable) {
+      let found = [];
+      try {
+        found = editable ? [{ editable, toolbar: findToolbarForEditable(editable) }].filter(({ toolbar }) => toolbar) : findEditors();
+        console.log('sf-char-counter: editors found', found.length);
+      } catch (err) {
+        try { console.error('sf-char-counter: editor detection threw', err); } catch (e) {}
+      }
+      found.forEach(attachEditor);
     }
 
     // Try immediately and also when focus enters editor areas
@@ -336,8 +330,8 @@
         const target = e.target;
         if (target && target.nodeType === Node.ELEMENT_NODE) {
           const el = /** @type {Element} */ (target);
-          if (el.matches('.ql-editor[contenteditable="true"], .slds-rich-text-area__content[contenteditable="true"], .ql-editor[contenteditable="true"]')) {
-            tryAttach();
+          if (el.matches(EDITABLE_SELECTOR)) {
+            tryAttach(el);
           }
         }
       } catch (err) {
@@ -345,9 +339,29 @@
       }
     });
 
-    // Observe DOM changes to attach when editors are added dynamically
-    const mo = new MutationObserver(() => {
-      if (!attached) tryAttach();
+    // Observe dynamically opened dialogs without rescanning on every Quill text
+    // mutation while a user is typing.
+    let attachScheduled = false;
+    function scheduleAttach() {
+      if (attachScheduled) return;
+      attachScheduled = true;
+      requestAnimationFrame(() => {
+        attachScheduled = false;
+        tryAttach();
+      });
+    }
+    const mo = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node.nodeType !== Node.ELEMENT_NODE) continue;
+          const element = /** @type {Element} */ (node);
+          if (element.matches(EDITABLE_SELECTOR) || element.matches(TOOLBAR_SELECTOR) ||
+              element.querySelector(EDITABLE_SELECTOR) || element.querySelector(TOOLBAR_SELECTOR)) {
+            scheduleAttach();
+            return;
+          }
+        }
+      }
     });
     mo.observe(document.body, { childList: true, subtree: true });
   }

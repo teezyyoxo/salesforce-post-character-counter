@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 0.2.0 - Feature: counter in Edit Post dialog
+- Detect and attach counters to every Salesforce rich-text editor, including the dynamically opened **Edit Post** dialog.
+- Track editor attachments independently so the main post composer no longer prevents modal editors from receiving a counter.
+- Bump extension version to `0.2.0`.
+
 ## 0.1.0 - Initial draft
 - Scaffolded Chrome extension manifest and content script
 - Options UI for alignment, limit, percentage, thresholds and colors
@@ -96,7 +101,6 @@
 - Validate the preset fetch response before parsing JSON and retain the existing fallback when loading fails.
 - Fix host preset matching to support the `hosts` array used by `presets.json`, while retaining compatibility with the legacy `match` property.
 - Bump extension version to `0.1.15`
-
 
 
 
